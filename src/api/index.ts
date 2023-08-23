@@ -1,5 +1,5 @@
 import type { AxiosProgressEvent, GenericAbortSignal } from 'axios'
-import { post } from '@/utils/request'
+import { get, post } from '@/utils/request'
 import { useAuthStore, useSettingStore } from '@/store'
 
 export function fetchChatAPI<T = any>(
@@ -23,6 +23,7 @@ export function fetchChatConfig<T = any>() {
 export function fetchChatAPIProcess<T = any>(
   params: {
     prompt: string
+    messages: any
     options?: { conversationId?: string; parentMessageId?: string }
     signal?: GenericAbortSignal
     onDownloadProgress?: (progressEvent: AxiosProgressEvent) => void },
@@ -33,19 +34,20 @@ export function fetchChatAPIProcess<T = any>(
   let data: Record<string, any> = {
     prompt: params.prompt,
     options: params.options,
+    messages: params.messages,
   }
 
-  if (authStore.isChatGPTAPI) {
-    data = {
-      ...data,
-      systemMessage: settingStore.systemMessage,
-      temperature: settingStore.temperature,
-      top_p: settingStore.top_p,
-    }
+  // if (authStore.isChatGPTAPI) {
+  data = {
+    ...data,
+    // systemMessage: settingStore.systemMessage,
+    temperature: settingStore.temperature,
+    top_p: settingStore.top_p,
   }
+  // }
 
   return post<T>({
-    url: '/chat-process',
+    url: '/chat',
     data,
     signal: params.signal,
     onDownloadProgress: params.onDownloadProgress,
@@ -53,8 +55,8 @@ export function fetchChatAPIProcess<T = any>(
 }
 
 export function fetchSession<T>() {
-  return post<T>({
-    url: '/session',
+  return get<T>({
+    url: '/userinfo',
   })
 }
 
