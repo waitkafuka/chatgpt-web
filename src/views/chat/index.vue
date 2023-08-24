@@ -21,6 +21,7 @@ import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { useChatStore, usePromptStore } from '@/store'
 import { fetchChatAPIProcess } from '@/api'
 import { t } from '@/locales'
+import AuthLogin from '@/components/common/AuthLogin.vue'
 
 let controller = new AbortController()
 
@@ -507,6 +508,7 @@ onUnmounted(() => {
 
 <template>
   <div class="flex flex-col w-full h-full">
+    <AuthLogin />
     <HeaderComponent
       v-if="isMobile"
       :using-context="usingContext"
