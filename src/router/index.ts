@@ -9,10 +9,10 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     name: 'Root',
     component: ChatLayout,
-    redirect: '/chat',
+    // redirect: '/',
     children: [
       {
-        path: '/chat/:uuid?',
+        path: '/:uuid?',
         name: 'Chat',
         component: () => import('@/views/chat/index.vue'),
       },
@@ -39,7 +39,7 @@ const routes: RouteRecordRaw[] = [
 ]
 
 export const router = createRouter({
-  history: createWebHistory('/chat-v2/'),
+  history: createWebHistory('/chat/'),
   routes,
   scrollBehavior: () => ({ left: 0, top: 0 }),
 })

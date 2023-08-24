@@ -494,6 +494,7 @@ const footerClass = computed(() => {
 
 onMounted(() => {
   scrollToBottom()
+  // importPrompts()
   if (inputRef.value && !isMobile.value)
     inputRef.value?.focus()
 })
@@ -528,7 +529,7 @@ onUnmounted(() => {
               class="flex items-center justify-center mt-4 text-center text-neutral-300"
             >
               <SvgIcon icon="ri:bubble-chart-fill" class="mr-2 text-3xl" />
-              <span>Aha~</span>
+              <span>你的私人助理，请输入你要完成的任务；按下 “ / ”，召唤更多模板~</span>
             </div>
           </template>
           <template v-else>

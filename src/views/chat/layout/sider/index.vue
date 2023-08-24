@@ -26,6 +26,10 @@ function handleUpdateCollapsed() {
   appStore.setSiderCollapsed(!collapsed.value)
 }
 
+function toPay() {
+  window.location.href = '/pay'
+}
+
 const getMobileClass = computed<CSSProperties>(() => {
   if (isMobile.value) {
     return {
@@ -80,6 +84,9 @@ watch(
           <List />
         </div>
         <div class="p-4">
+          <NButton block @click="toPay">
+            充值会员
+          </NButton>
           <NButton block @click="show = true">
             {{ $t('store.siderButton') }}
           </NButton>

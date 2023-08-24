@@ -1,7 +1,7 @@
 {
   "prettier.enable": false,
   "editor.formatOnSave": false,
-  "editor.defaultFormatter": "rvest.vs-code-prettier-eslint", // 将prettier-eslint作为默认全格式文件的格式化程序
+  // "editor.defaultFormatter": "rvest.vs-code-prettier-eslint", // 将prettier-eslint作为默认全格式文件的格式化程序
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },

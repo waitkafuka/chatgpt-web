@@ -30,9 +30,14 @@ export default defineConfig((env) => {
         '@': path.resolve(process.cwd(), 'src'),
       },
     },
-    base: 'chat-v2',
+    base: '/chat',
     plugins: setupPlugins(viteEnv),
     server: {
+      hmr: {
+        protocol: 'ws',
+        host: '127.0.0.1',
+        port: 1002,
+      },
       host: '0.0.0.0',
       port: 1002,
       open: false,
@@ -45,7 +50,6 @@ export default defineConfig((env) => {
       // },
     },
     build: {
-      outDir: 'chat-v2',
       reportCompressedSize: false,
       sourcemap: false,
       commonjsOptions: {

@@ -3,14 +3,16 @@ import { computed, ref } from 'vue'
 import { NButton, NInput, NPopconfirm, NSelect, useMessage } from 'naive-ui'
 import type { Language, Theme } from '@/store/modules/app/helper'
 import { SvgIcon } from '@/components/common'
-import { useAppStore, useUserStore } from '@/store'
+import { useAppStore, useAuthStore, useUserStore } from '@/store'
 import type { UserInfo } from '@/store/modules/user/helper'
 import { getCurrentDate } from '@/utils/functions'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { t } from '@/locales'
+import { requestAliyun } from '@/utils/http'
 
 const appStore = useAppStore()
 const userStore = useUserStore()
+const authStore = useAuthStore()
 
 const { isMobile } = useBasicLayout()
 
@@ -20,9 +22,11 @@ const theme = computed(() => appStore.theme)
 
 const userInfo = computed(() => userStore.userInfo)
 
+const session = computed(() => authStore.session)
+
 const avatar = ref(userInfo.value.avatar ?? '')
 
-const name = ref(userInfo.value.name ?? '')
+const name = ref(session.value?.nickname ?? '')
 
 const description = ref(userInfo.value.description ?? '')
 
@@ -61,10 +65,27 @@ const languageOptions: { label: string; key: Language; value: Language }[] = [
   { label: 'Русский язык', key: 'ru-RU', value: 'ru-RU' },
 ]
 
-function updateUserInfo(options: Partial<UserInfo>) {
-  userStore.updateUserInfo(options)
-  ms.success(t('common.success'))
+async function updateUserInfo(options: Partial<UserInfo>) {
+  // 如果是昵称
+  if (options.name) {
+    // 调用保存接口进行保存
+    const res = await requestAliyun('/edit-user', {
+      nickname: options.name,
+    })
+    if (res.code === 0) {
+      authStore.setSession(res.user)
+      ms.success(t('common.success'))
+    }
+    else { ms.error(res.message) }
+  }
+  // userStore.updateUserInfo(options)
 }
+
+const nickname = computed(() => {
+  if (authStore.session)
+    return authStore.session.nickname
+  return ''
+})
 
 function handleReset() {
   userStore.resetUserInfo()
@@ -125,7 +146,8 @@ function handleImportButtonClick(): void {
 <template>
   <div class="p-4 space-y-5 min-h-[200px]">
     <div class="space-y-6">
-      <div class="flex items-center space-x-4">
+      <!-- 修改头像 -->
+      <!-- <div class="flex items-center space-x-4">
         <span class="flex-shrink-0 w-[100px]">{{ $t('setting.avatarLink') }}</span>
         <div class="flex-1">
           <NInput v-model:value="avatar" placeholder="" />
@@ -133,7 +155,8 @@ function handleImportButtonClick(): void {
         <NButton size="tiny" text type="primary" @click="updateUserInfo({ avatar })">
           {{ $t('common.save') }}
         </NButton>
-      </div>
+      </div> -->
+      <!-- 修改昵称 -->
       <div class="flex items-center space-x-4">
         <span class="flex-shrink-0 w-[100px]">{{ $t('setting.name') }}</span>
         <div class="w-[200px]">
@@ -143,7 +166,7 @@ function handleImportButtonClick(): void {
           {{ $t('common.save') }}
         </NButton>
       </div>
-      <div class="flex items-center space-x-4">
+      <!-- <div class="flex items-center space-x-4">
         <span class="flex-shrink-0 w-[100px]">{{ $t('setting.description') }}</span>
         <div class="flex-1">
           <NInput v-model:value="description" placeholder="" />
@@ -151,7 +174,7 @@ function handleImportButtonClick(): void {
         <NButton size="tiny" text type="primary" @click="updateUserInfo({ description })">
           {{ $t('common.save') }}
         </NButton>
-      </div>
+      </div> -->
       <div
         class="flex items-center space-x-4"
         :class="isMobile && 'items-start'"
@@ -214,12 +237,12 @@ function handleImportButtonClick(): void {
           />
         </div>
       </div>
-      <div class="flex items-center space-x-4">
+      <!-- <div class="flex items-center space-x-4">
         <span class="flex-shrink-0 w-[100px]">{{ $t('setting.resetUserInfo') }}</span>
         <NButton size="small" @click="handleReset">
           {{ $t('common.reset') }}
         </NButton>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>

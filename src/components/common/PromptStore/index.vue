@@ -1,9 +1,8 @@
 <script setup lang='ts'>
 import type { DataTableColumns } from 'naive-ui'
-import { computed, h, ref, watch } from 'vue'
-import { NButton, NCard, NDataTable, NDivider, NInput, NList, NListItem, NModal, NPopconfirm, NSpace, NTabPane, NTabs, NThing, useMessage } from 'naive-ui'
-import PromptRecommend from '../../../assets/recommend.json'
-import { SvgIcon } from '..'
+import { computed, h, onMounted, ref, watch } from 'vue'
+import { NButton, NDataTable, NDivider, NInput, NList, NListItem, NModal, NSpace, NTabPane, NTabs, NThing, useMessage } from 'naive-ui'
+// import PromptRecommend from '../../../assets/recommend.json'
 import { usePromptStore } from '@/store'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { t } from '@/locales'
@@ -47,7 +46,7 @@ const { isMobile } = useBasicLayout()
 const promptStore = usePromptStore()
 
 // Prompt在线导入推荐List,根据部署者喜好进行修改(assets/recommend.json)
-const promptRecommendList = PromptRecommend
+// const promptRecommendList = PromptRecommend
 const promptList = ref<any>(promptStore.promptList)
 
 // 用于添加修改的临时prompt参数
@@ -186,7 +185,7 @@ const importPromptTemplate = (from = 'online') => {
       if (safe)
         promptList.value.unshift({ key: i[key], value: i[value] } as never)
     }
-    message.success(t('common.importSuccess'))
+    from !== 'first' && message.success(t('common.importSuccess'))
   }
   catch {
     message.error('JSON 格式错误，请检查 JSON 格式')
@@ -210,7 +209,7 @@ const exportPromptTemplate = () => {
 }
 
 // 模板在线导入
-const downloadPromptTemplate = async () => {
+const downloadPromptTemplate = async (type: string) => {
   try {
     importLoading.value = true
     const response = await fetch(downloadURL.value)
@@ -226,7 +225,7 @@ const downloadPromptTemplate = async () => {
       })
       tempPromptValue.value = JSON.stringify(newJsonData)
     }
-    importPromptTemplate()
+    importPromptTemplate(type)
     downloadURL.value = ''
   }
   catch {
@@ -242,7 +241,7 @@ const downloadPromptTemplate = async () => {
 const renderTemplate = () => {
   const [keyLimit, valueLimit] = isMobile.value ? [10, 30] : [15, 50]
 
-  return promptList.value.map((item: { key: string; value: string }) => {
+  return promptList.value?.map((item: { key: string; value: string }) => {
     return {
       renderKey: item.key.length <= keyLimit ? item.key : `${item.key.substring(0, keyLimit)}...`,
       renderValue: item.value.length <= valueLimit ? item.value : `${item.value.substring(0, valueLimit)}...`,
@@ -324,6 +323,19 @@ const dataSource = computed(() => {
   }
   return data
 })
+
+async function firstImportPrompts() {
+  // 判断是否导入过
+  if (localStorage.getItem('promptsImported'))
+    return
+  setDownloadURL('https://c.superx.chat/stuff/prompts.json')
+  await downloadPromptTemplate('first')
+  localStorage.setItem('promptsImported', 'true')
+}
+
+onMounted(() => {
+  firstImportPrompts()
+})
 </script>
 
 <template>
@@ -356,15 +368,18 @@ const dataSource = computed(() => {
               >
                 {{ $t('common.export') }}
               </NButton>
-              <NPopconfirm @positive-click="clearPromptTemplate">
+              <!-- <NPopconfirm @positive-click="clearPromptTemplate">
                 <template #trigger>
                   <NButton size="small">
                     {{ $t('common.clear') }}
                   </NButton>
                 </template>
                 {{ $t('store.clearStoreConfirm') }}
-              </NPopconfirm>
+              </NPopconfirm> -->
             </div>
+            <p style="line-height: 2.6;">
+              添加完成后，在聊天对话输入框中输入 “ / ” 以召唤提示词使用。
+            </p>
             <div class="flex items-center">
               <NInput v-model:value="searchValue" style="width: 100%" />
             </div>
@@ -394,8 +409,11 @@ const dataSource = computed(() => {
           </NList>
         </NTabPane>
         <NTabPane name="download" :tab="$t('store.online')">
-          <p class="mb-4">
+          <!-- <p class="mb-4">
             {{ $t('store.onlineImportWarning') }}
+          </p> -->
+          <p class="mb-4">
+            可按规定格式导入在线json，内容格式请参考：<a style="text-decoration: underline;" target="_blank" href="https://superx.chat/stuff/prompts.json">https://superx.chat/stuff/prompts.json</a> （请勿重复导入本文件）
           </p>
           <div class="flex items-center gap-4">
             <NInput v-model:value="downloadURL" placeholder="" />
@@ -410,7 +428,7 @@ const dataSource = computed(() => {
             </NButton>
           </div>
           <NDivider />
-          <div class="max-h-[360px] overflow-y-auto space-y-4">
+          <!-- <div class="max-h-[360px] overflow-y-auto space-y-4">
             <NCard
               v-for="info in promptRecommendList"
               :key="info.key" :title="info.key"
@@ -439,7 +457,7 @@ const dataSource = computed(() => {
                 </div>
               </template>
             </NCard>
-          </div>
+          </div> -->
         </NTabPane>
       </NTabs>
     </div>
@@ -473,7 +491,7 @@ const dataSource = computed(() => {
         :disabled="inputStatus"
         @click="() => { importPromptTemplate('local') }"
       >
-        {{ t('common.import') }}
+        {{ `${t('common.import')}` }}
       </NButton>
     </NSpace>
   </NModal>

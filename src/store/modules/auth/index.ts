@@ -7,6 +7,7 @@ interface SessionResponse {
   auth: boolean
   user: any
   model: 'ChatGPTAPI' | 'ChatGPTUnofficialProxyAPI'
+  nickname: string
 }
 
 export interface AuthState {
@@ -38,6 +39,10 @@ export const useAuthStore = defineStore('auth-store', {
       catch (error) {
         return Promise.reject(error)
       }
+    },
+
+    setSession(user: any) {
+      this.session = user
     },
 
     setToken(token: string) {
