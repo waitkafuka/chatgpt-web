@@ -29,7 +29,8 @@ const session = computed(() => authStore.session)
       <h2
         class="overflow-hidden font-bold text-md text-ellipsis whitespace-nowrap"
       >
-        {{ session?.nickname ?? "匿名用户" }}
+        <span v-if="session?.nickname">{{ session.nickname }}</span>
+        <a v-else href="/login">未登录</a>
       </h2>
       <p
         class="overflow-hidden text-xs text-gray-500 text-ellipsis whitespace-nowrap"

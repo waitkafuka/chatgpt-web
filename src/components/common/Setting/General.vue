@@ -136,6 +136,12 @@ function clearData(): void {
   location.reload()
 }
 
+async function logout() {
+  await requestAliyun('/logout', null, 'GET')
+  window.location.href = '/login'
+  authStore.setSession({})
+}
+
 function handleImportButtonClick(): void {
   const fileInput = document.getElementById('fileInput') as HTMLElement
   if (fileInput)
@@ -235,6 +241,20 @@ function handleImportButtonClick(): void {
             :options="languageOptions"
             @update-value="value => appStore.setLanguage(value)"
           />
+        </div>
+      </div>
+      <div class="flex items-center space-x-4">
+        <span class="flex-shrink-0 w-[100px]">用户</span>
+        <div class="flex flex-wrap items-center gap-4">
+          <NButton
+            size="small"
+            @click="logout"
+          >
+            <!-- <template #icon>
+              <SvgIcon icon="ri:moon-foggy-line" />
+            </template> -->
+            退出登录
+          </NButton>
         </div>
       </div>
       <!-- <div class="flex items-center space-x-4">
