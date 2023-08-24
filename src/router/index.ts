@@ -39,7 +39,7 @@ const routes: RouteRecordRaw[] = [
 ]
 
 export const router = createRouter({
-  history: createWebHistory('/chat/'),
+  history: createWebHistory('/chat-v2/'),
   routes,
   scrollBehavior: () => ({ left: 0, top: 0 }),
 })

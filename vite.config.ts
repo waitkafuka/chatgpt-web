@@ -30,7 +30,7 @@ export default defineConfig((env) => {
         '@': path.resolve(process.cwd(), 'src'),
       },
     },
-    base: '/chat',
+    base: '/chat-v2',
     plugins: setupPlugins(viteEnv),
     server: {
       hmr: {
